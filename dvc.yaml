@@ -2,19 +2,30 @@ stages:
   data_ingestion:
     cmd: python src/data_ingestion.py
     outs:
-      - Data/raw
+      - Data/raw/X.csv
+      - Data/raw/y.csv
 
   preprocess:
     cmd: python src/preprocessing.py
+    params:
+      - data.test_size
+      - data.random_state
     deps:
-      - Data/raw
-    outs:
-      - Data/processed
+      - Data/raw/X.csv
+      - Data/raw/y.csv
+    outs :
+      - Data/processed/X_train.csv
+      - Data/processed/X_test.csv
+      - Data/processed/y_train.csv
+      - Data/processed/y_test.csv
 
   model_train:
     cmd: python src/model_train.py
     deps:
-      - Data/processed
+      - Data/processed/X_train.csv
+      - Data/processed/y_train.csv
+    params :
+      - model.max_iter
     outs:
       - models/model.pkl
 
@@ -22,7 +33,8 @@ stages:
     cmd: python src/model_eval.py
     deps:
       - models/model.pkl
-      - Data/processed
+      - Data/processed/X_test.csv
+      - Data/processed/y_test.csv
     outs:
       - score/score.json
 

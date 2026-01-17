@@ -5,8 +5,11 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 import pathlib
 import pandas as pd
+from utils import load_params
 
 def train_model():
+    params = load_params()
+    p = params['model']
     x_train_path = pathlib.Path(
         r"C:\Users\ADIL TRADERS\Desktop\PROJECT\cicd\Data\processed\X_train.csv"
     )
@@ -16,10 +19,10 @@ def train_model():
 
     X_train = pd.read_csv(x_train_path)
     y_train = pd.read_csv(y_train_path).squeeze()  # FIX 1
-
+    max_iter = p["max_iter"]
     pipeline = Pipeline([
         ("scaler", StandardScaler()),
-        ("model", LogisticRegression(max_iter=1600))
+        ("model", LogisticRegression(max_iter=max_iter))
     ])
 
     pipeline.fit(X_train, y_train)

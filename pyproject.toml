@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "awscli>=1.44.20",
     "dagshub>=0.6.4",
     "dvc>=3.66.1",
     "mlflow>=3.8.1",
