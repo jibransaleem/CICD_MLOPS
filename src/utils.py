@@ -1,12 +1,13 @@
 import yaml
-import pathlib
+from pathlib import Path
 
 def load_params():
-    uri = r"C:\Users\ADIL TRADERS\Desktop\PROJECT\cicd\params.yaml"
-    path = pathlib.Path(uri)
+    # Relative path inside the repository
+    path = Path("params.yaml")
     
     # Open and load the YAML
     with open(path, "r") as file:
-        data = yaml.safe_load(file)  # <-- use safe_load, not 'yaml.sa...'
+        data = yaml.safe_load(file)  # safe_load is recommended
+    
     return dict(data)
-print(load_params())
+
