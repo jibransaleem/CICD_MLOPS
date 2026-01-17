@@ -9,19 +9,18 @@ import os
 
 def log_to_mlflow():
     # Non-interactive authentication via env variables
-    DAGSHUB_TOKEN = os.environ["DAGS_HUB_TOKEN"]
     MLFLOW_TRACKING_URI = os.environ["MLFLOW_TRACKING_URI"]
+    # DAGSHUB_TOKEN should be set as environment variable in CI (no token= argument needed)
 
     # Initialize MLflow with tracking URI
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
     mlflow.set_experiment("cicd-experiment")
 
-    # Initialize DagsHub with token (non-interactive)
+    # Initialize DagsHub (token picked from environment automatically)
     dagshub.init(
         repo_owner='saleemjibran813',
         repo_name='CICD_MLOPS',
-        mlflow=True,
-        token=DAGSHUB_TOKEN
+        mlflow=True
     )
 
     model_name = "my-model"
