@@ -10,16 +10,25 @@ import os
 def log_to_mlflow():
     # Get DagsHub token from environment
     DAGSHUB_TOKEN = os.getenv("DAGSHUB_TOKEN")
-    os.environ["MLFLOW_TRACKING_USERNAME"] = DAGSHUB_TOKEN
-    os.environ["MLFLOW_TRACKING_PASSWORD"] = DAGSHUB_TOKEN
     
     # Validation
     if not DAGSHUB_TOKEN:
         raise ValueError("❌ DAGSHUB_TOKEN environment variable not set!")
     
     print(f"✅ DagsHub token found: {DAGSHUB_TOKEN[:10]}...")
+    
+    # Set MLflow credentials using DagsHub token
+    os.environ["MLFLOW_TRACKING_USERNAME"] = DAGSHUB_TOKEN
+    os.environ["MLFLOW_TRACKING_PASSWORD"] = DAGSHUB_TOKEN
+    
+    # Verify MLflow tracking URI is set
+    mlflow_uri = os.getenv("MLFLOW_TRACKING_URI")
+    if not mlflow_uri:
+        raise ValueError("❌ MLFLOW_TRACKING_URI environment variable not set!")
+    
+    print(f"✅ MLflow Tracking URI: {mlflow_uri}")
 
-    # Initialize DagsHub FIRST - this auto-configures MLflow auth
+    # Initialize DagsHub - this auto-configures MLflow auth
     dagshub.init(
         repo_owner='saleemjibran813',
         repo_name='CICD_MLOPS',
@@ -38,9 +47,9 @@ def log_to_mlflow():
 
     # Validate files exist
     if not score_path.exists():
-        raise FileNotFoundError(f"Score file not found at {score_path}")
+        raise FileNotFoundError(f"❌ Score file not found at {score_path}")
     if not model_path.exists():
-        raise FileNotFoundError(f"Model file not found at {model_path}")
+        raise FileNotFoundError(f"❌ Model file not found at {model_path}")
 
     # Load evaluation scores
     with open(score_path, "r") as file:
@@ -67,18 +76,24 @@ def log_to_mlflow():
     # Transition model stage in MLflow
     print("🔄 Transitioning model to Staging...")
     client = MlflowClient()
-    latest_versions = client.get_latest_versions(model_name, stages=["None"])
-    if latest_versions:
-        model_version = latest_versions[-1].version
-        client.transition_model_version_stage(
-            name=model_name,
-            version=model_version,
-            stage="Staging",
-            archive_existing_versions=True
-        )
-        print(f"✅ Model {model_name} v{model_version} moved to STAGING")
-    else:
-        print("⚠️  No model version found to transition.")
+    
+    try:
+        latest_versions = client.get_latest_versions(model_name, stages=["None"])
+        if latest_versions:
+            model_version = latest_versions[-1].version
+            client.transition_model_version_stage(
+                name=model_name,
+                version=model_version,
+                stage="Staging",
+                archive_existing_versions=True
+            )
+            print(f"✅ Model {model_name} v{model_version} moved to STAGING")
+        else:
+            print("⚠️  No model version found to transition.")
+    except Exception as e:
+        print(f"⚠️  Error transitioning model: {e}")
+        # Don't fail the entire process if staging fails
+        print("Continuing despite staging error...")
 
 if __name__ == "__main__":
     log_to_mlflow()
