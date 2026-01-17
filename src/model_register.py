@@ -8,29 +8,25 @@ import pickle
 import os
 
 def log_to_mlflow():
-    # Get credentials from environment
-    MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
+    # Get DagsHub token from environment
     DAGSHUB_TOKEN = os.getenv("DAGSHUB_TOKEN")
     
     # Validation
-    if not MLFLOW_TRACKING_URI:
-        raise ValueError("❌ MLFLOW_TRACKING_URI environment variable not set!")
     if not DAGSHUB_TOKEN:
         raise ValueError("❌ DAGSHUB_TOKEN environment variable not set!")
     
-    print(f"✅ Using MLflow URI: {MLFLOW_TRACKING_URI}")
     print(f"✅ DagsHub token found: {DAGSHUB_TOKEN[:10]}...")
 
-    # Initialize MLflow with tracking URI
-    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-    mlflow.set_experiment("cicd-experiment")
-
-    # Initialize DagsHub
+    # Initialize DagsHub FIRST - this auto-configures MLflow auth
     dagshub.init(
         repo_owner='saleemjibran813',
         repo_name='CICD_MLOPS',
         mlflow=True
     )
+    
+    # Set experiment
+    mlflow.set_experiment("cicd-experiment")
+    print(f"✅ Using MLflow URI: {mlflow.get_tracking_uri()}")
 
     model_name = "my-model"
 
