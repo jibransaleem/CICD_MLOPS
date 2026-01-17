@@ -1,0 +1,33 @@
+stages:
+  data_ingestion:
+    cmd: python src/data_ingestion.py
+    outs:
+      - Data/raw
+
+  preprocess:
+    cmd: python src/preprocessing.py
+    deps:
+      - Data/raw
+    outs:
+      - Data/processed
+
+  model_train:
+    cmd: python src/model_train.py
+    deps:
+      - Data/processed
+    outs:
+      - models/model.pkl
+
+  model_eval:
+    cmd: python src/model_eval.py
+    deps:
+      - models/model.pkl
+      - Data/processed
+    outs:
+      - score/score.json
+
+  model_register:
+    cmd: python src/model_register.py
+    deps:
+      - models/model.pkl
+      - score/score.json
