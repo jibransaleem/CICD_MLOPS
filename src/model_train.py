@@ -19,7 +19,7 @@ def train_model():
 
     pipeline = Pipeline([
         ("scaler", StandardScaler()),
-        ("model", LogisticRegression(max_iter=1400))
+        ("model", LogisticRegression(max_iter=1600))
     ])
 
     pipeline.fit(X_train, y_train)

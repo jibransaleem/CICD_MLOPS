@@ -4,11 +4,14 @@ import pathlib
 import json
 import pickle
 from mlflow.tracking import MlflowClient
-
+import dagshub
 def log_to_mlflow():
 
-    mlflow.set_tracking_uri("https://localhost:5000")
+    mlflow.set_tracking_uri("https://dagshub.com/saleemjibran813/CICD_MLOPS.mlflow") 
+    dagshub.init(repo_owner='saleemjibran813', repo_name='CICD_MLOPS', mlflow=True)
     mlflow.set_experiment("cicd-experiment")
+    
+
 
     model_name = "my-model"
 

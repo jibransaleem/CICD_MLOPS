@@ -1,0 +1,4 @@
+name : CI-WORKFLOW
+
+on : [push ,pull_requests]
+
