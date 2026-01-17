@@ -1,9 +1,6 @@
 name: CI-WORKFLOW
 
-on:
-  push:
-  pull_request:
-
+on: [push , pull_request]
 jobs:
   project_testing:
     runs-on: ubuntu-latest
