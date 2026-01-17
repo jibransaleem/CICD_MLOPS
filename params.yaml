@@ -1,6 +1,6 @@
 data:
-  test_size: 0.3
-  random_state: 4
+  test_size: 0.4
+  random_state: 40
 
 model:
-  max_iter: 1121
+  max_iter: 1700
