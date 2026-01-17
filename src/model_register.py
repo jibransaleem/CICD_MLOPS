@@ -17,8 +17,8 @@ def log_to_mlflow():
     
     print(f"✅ DagsHub token found: {DAGSHUB_TOKEN[:10]}...")
     
-    # Set MLflow credentials using DagsHub token
-    os.environ["MLFLOW_TRACKING_USERNAME"] = DAGSHUB_TOKEN
+    # Set MLflow credentials - USERNAME is your DagsHub username, PASSWORD is the token
+    os.environ["MLFLOW_TRACKING_USERNAME"] = "saleemjibran813"
     os.environ["MLFLOW_TRACKING_PASSWORD"] = DAGSHUB_TOKEN
     
     # Verify MLflow tracking URI is set
@@ -27,6 +27,7 @@ def log_to_mlflow():
         raise ValueError("❌ MLFLOW_TRACKING_URI environment variable not set!")
     
     print(f"✅ MLflow Tracking URI: {mlflow_uri}")
+    print(f"✅ MLflow Username: saleemjibran813")
 
     # Initialize DagsHub - this auto-configures MLflow auth
     dagshub.init(
