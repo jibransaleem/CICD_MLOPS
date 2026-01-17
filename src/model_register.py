@@ -10,7 +10,7 @@ import os
 def log_to_mlflow():
     # Get credentials from environment
     MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
-    DAGSHUB_TOKEN = os.getenv("DAGSHUB_TOKEN")
+    DAGSHUB_TOKEN = os.getenv("DAGS_HUB_TOKEN")
     
     # Validation
     if not MLFLOW_TRACKING_URI:
