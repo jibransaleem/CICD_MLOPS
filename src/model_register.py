@@ -5,12 +5,24 @@ import dagshub
 from pathlib import Path
 import json
 import pickle
+import os
 
 def log_to_mlflow():
-    # Initialize MLflow
-    mlflow.set_tracking_uri("https://dagshub.com/saleemjibran813/CICD_MLOPS.mlflow")
-    dagshub.init(repo_owner='saleemjibran813', repo_name='CICD_MLOPS', mlflow=True)
+    # Non-interactive authentication via env variables
+    DAGSHUB_TOKEN = os.environ["DAGS_HUB_TOKEN"]
+    MLFLOW_TRACKING_URI = os.environ["MLFLOW_TRACKING_URI"]
+
+    # Initialize MLflow with tracking URI
+    mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
     mlflow.set_experiment("cicd-experiment")
+
+    # Initialize DagsHub with token (non-interactive)
+    dagshub.init(
+        repo_owner='saleemjibran813',
+        repo_name='CICD_MLOPS',
+        mlflow=True,
+        token=DAGSHUB_TOKEN
+    )
 
     model_name = "my-model"
 
