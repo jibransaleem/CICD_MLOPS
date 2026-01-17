@@ -56,7 +56,7 @@ stages:
       size: 1202
     params:
       params.yaml:
-        model.max_iter: 1000
+        model.max_iter: 1121
     outs:
     - path: models/model.pkl
       hash: md5

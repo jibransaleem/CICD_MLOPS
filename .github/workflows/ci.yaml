@@ -43,9 +43,22 @@ jobs:
       # Run DVC repro including model_register
       - name: DVC repro
         env:
+          # AWS credentials for DVC
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-          DAGS_HUB_TOKEN: ${{ secrets.DAGS_HUB_TOKEN }}
+          
+          # DagsHub/MLflow credentials (FIXED!)
+          DAGSHUB_TOKEN: ${{ secrets.DAGS_HUB_TOKEN }}
           MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+          MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGS_HUB_TOKEN }}
         run: dvc repro -v
+      
+      # Optional: Push changes back to DVC
+      - name: DVC push
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        run: dvc push

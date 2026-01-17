@@ -8,15 +8,24 @@ import pickle
 import os
 
 def log_to_mlflow():
-    # Non-interactive authentication via env variables
-    MLFLOW_TRACKING_URI = os.environ["MLFLOW_TRACKING_URI"]
-    # DAGSHUB_TOKEN should be set as environment variable in CI (no token= argument needed)
+    # Get credentials from environment
+    MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI")
+    DAGSHUB_TOKEN = os.getenv("DAGSHUB_TOKEN")
+    
+    # Validation
+    if not MLFLOW_TRACKING_URI:
+        raise ValueError("❌ MLFLOW_TRACKING_URI environment variable not set!")
+    if not DAGSHUB_TOKEN:
+        raise ValueError("❌ DAGSHUB_TOKEN environment variable not set!")
+    
+    print(f"✅ Using MLflow URI: {MLFLOW_TRACKING_URI}")
+    print(f"✅ DagsHub token found: {DAGSHUB_TOKEN[:10]}...")
 
     # Initialize MLflow with tracking URI
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
     mlflow.set_experiment("cicd-experiment")
 
-    # Initialize DagsHub (token picked from environment automatically)
+    # Initialize DagsHub
     dagshub.init(
         repo_owner='saleemjibran813',
         repo_name='CICD_MLOPS',
@@ -29,15 +38,24 @@ def log_to_mlflow():
     score_path = Path("score/score.json")
     model_path = Path("models/model.pkl")
 
+    # Validate files exist
+    if not score_path.exists():
+        raise FileNotFoundError(f"Score file not found at {score_path}")
+    if not model_path.exists():
+        raise FileNotFoundError(f"Model file not found at {model_path}")
+
     # Load evaluation scores
     with open(score_path, "r") as file:
         score = json.load(file)
+    print(f"✅ Loaded scores: {score}")
 
     # Load trained model
     with open(model_path, "rb") as f:
         model = pickle.load(f)
+    print(f"✅ Loaded model from {model_path}")
 
     # Log metrics and model to MLflow
+    print("📤 Logging to MLflow...")
     with mlflow.start_run() as run:
         mlflow.log_metrics(score)
         mlflow.sklearn.log_model(
@@ -46,8 +64,10 @@ def log_to_mlflow():
             registered_model_name=model_name
         )
         run_id = run.info.run_id
+        print(f"✅ Run ID: {run_id}")
 
     # Transition model stage in MLflow
+    print("🔄 Transitioning model to Staging...")
     client = MlflowClient()
     latest_versions = client.get_latest_versions(model_name, stages=["None"])
     if latest_versions:
@@ -58,9 +78,9 @@ def log_to_mlflow():
             stage="Staging",
             archive_existing_versions=True
         )
-        print(f"Model {model_name} v{model_version} moved to STAGING")
+        print(f"✅ Model {model_name} v{model_version} moved to STAGING")
     else:
-        print("No model version found to transition.")
+        print("⚠️  No model version found to transition.")
 
 if __name__ == "__main__":
     log_to_mlflow()
