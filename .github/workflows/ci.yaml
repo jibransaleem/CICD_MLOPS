@@ -21,4 +21,4 @@ jobs:
       - name: DVC pull
         run: dvc pull
       - name: DVC repro
-        run: dvc repro
+        run: dvc repro -v 

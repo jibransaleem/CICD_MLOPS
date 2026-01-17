@@ -35,4 +35,6 @@ def preprocess_data():
     return X_train, X_test, y_train, y_test
 
 if __name__ == "__main__":
+    print("start pre")
     preprocess_data()
+    print("end pre")

@@ -18,4 +18,6 @@ def ingest_data():
     y.to_csv(raw_path / "y.csv", index=False)
 
 if __name__ == "__main__":
+    print("start data inge")
     ingest_data()
+    print("end data injes")
